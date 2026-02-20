@@ -1,10 +1,3 @@
-//
-//  SnippetApp.swift
-//  Snippet
-//
-//  Created by Michał Pożdał on 20/02/2026.
-//
-
 import SwiftUI
 
 @main
