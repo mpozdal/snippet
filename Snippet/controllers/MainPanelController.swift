@@ -8,19 +8,33 @@ final class MainPanelController {
 
     let height: CGFloat = Constants.Panels.mainHeight
 
-    func show(relativeTo button: NSStatusBarButton?) {
+    func show(relativeTo button: NSStatusBarButton?, manager: ClipboardManager) {
         if panel == nil {
-            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: MenuPopupView())
+            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: MenuPopupView(manager: manager))
         }
 
         position(panel: panel, relativeTo: button)
         panel?.makeKeyAndOrderFront(nil)
         isShown = true
+
+        if clickMonitor == nil, let panel = panel {
+            clickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self, weak panel] _ in
+                guard let self, let panel = panel else { return }
+                if !panel.frame.contains(NSEvent.mouseLocation) {
+                    self.hide()
+                }
+            }
+        }
     }
 
     func hide() {
         panel?.orderOut(nil)
         isShown = false
+        // Remove the click monitor if present
+        if let monitor = clickMonitor {
+            NSEvent.removeMonitor(monitor)
+            clickMonitor = nil
+        }
     }
 
     private func position(panel: NSPanel?, relativeTo button: NSStatusBarButton?) {

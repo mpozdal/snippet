@@ -4,6 +4,7 @@ import SwiftUI
 final class BottomPanelController {
     private var panel: NSPanel?
     private let height: CGFloat = Constants.Panels.bottomHeight
+    private var clickMonitor: Any?
 
     func show(relativeTo button: NSStatusBarButton?, mainPanelHeight: CGFloat) {
         if panel == nil {
@@ -12,6 +13,15 @@ final class BottomPanelController {
 
         position(panel: panel, relativeTo: button, mainPanelHeight: mainPanelHeight)
         panel?.makeKeyAndOrderFront(nil)
+
+        if clickMonitor == nil, let panel = panel {
+            clickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self, weak panel] _ in
+                guard let self, let panel = panel else { return }
+                if !panel.frame.contains(NSEvent.mouseLocation) {
+                    self.hide()
+                }
+            }
+        }
     }
 
     func hide() {
