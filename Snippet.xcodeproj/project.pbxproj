@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DFAA38862F4DB25800627EE6 /* Highlightr in Frameworks */ = {isa = PBXBuildFile; productRef = DFAA38852F4DB25800627EE6 /* Highlightr */; };
+		DFAA38962F4E401100627EE6 /* Highlighter in Frameworks */ = {isa = PBXBuildFile; productRef = DFAA38952F4E401100627EE6 /* Highlighter */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DFE7FF542F4902C30086BCA7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -42,6 +47,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFAA38962F4E401100627EE6 /* Highlighter in Frameworks */,
+				DFAA38862F4DB25800627EE6 /* Highlightr in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +107,8 @@
 			);
 			name = Snippet;
 			packageProductDependencies = (
+				DFAA38852F4DB25800627EE6 /* Highlightr */,
+				DFAA38952F4E401100627EE6 /* Highlighter */,
 			);
 			productName = Snippet;
 			productReference = DFE7FF462F4902C10086BCA7 /* Snippet.app */;
@@ -177,6 +186,10 @@
 			);
 			mainGroup = DFE7FF3D2F4902C10086BCA7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DFAA38842F4DB25700627EE6 /* XCRemoteSwiftPackageReference "Highlightr" */,
+				DFAA38942F4E401100627EE6 /* XCRemoteSwiftPackageReference "HighlighterSwift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFE7FF472F4902C10086BCA7 /* Products */;
 			projectDirPath = "";
@@ -557,6 +570,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DFAA38842F4DB25700627EE6 /* XCRemoteSwiftPackageReference "Highlightr" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/raspu/Highlightr.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
+		DFAA38942F4E401100627EE6 /* XCRemoteSwiftPackageReference "HighlighterSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/smittytone/HighlighterSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DFAA38852F4DB25800627EE6 /* Highlightr */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFAA38842F4DB25700627EE6 /* XCRemoteSwiftPackageReference "Highlightr" */;
+			productName = Highlightr;
+		};
+		DFAA38952F4E401100627EE6 /* Highlighter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFAA38942F4E401100627EE6 /* XCRemoteSwiftPackageReference "HighlighterSwift" */;
+			productName = Highlighter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DFE7FF3E2F4902C10086BCA7 /* Project object */;
 }

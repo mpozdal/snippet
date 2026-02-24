@@ -6,9 +6,9 @@ final class BottomPanelController {
     private let height: CGFloat = Constants.Panels.bottomHeight
     private var clickMonitor: Any?
 
-    func show(relativeTo button: NSStatusBarButton?, mainPanelHeight: CGFloat) {
+    func show(relativeTo button: NSStatusBarButton?, mainPanelHeight: CGFloat, formatter: CodeFormatter) {
         if panel == nil {
-            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: BottomBarView())
+            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: BottomBarView().environment(formatter))
         }
 
         position(panel: panel, relativeTo: button, mainPanelHeight: mainPanelHeight)

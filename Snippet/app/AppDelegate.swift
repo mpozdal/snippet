@@ -10,11 +10,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let mainPanel = MainPanelController()
     private let bottomPanel = BottomPanelController()
 
+    private var formatter = CodeFormatter()
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "square.dashed", accessibilityDescription: nil)
+            button.image = NSImage(systemSymbolName: "curlybraces", accessibilityDescription: nil)
             button.action = #selector(togglePanels)
             button.target = self
         }
@@ -61,8 +63,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        mainPanel.show(relativeTo: statusItem.button, manager: clipboardManager)
-        bottomPanel.show(relativeTo: statusItem.button, mainPanelHeight: mainPanel.height)
+        mainPanel.show(relativeTo: statusItem.button, manager: clipboardManager, formatter: formatter)
+        bottomPanel.show(relativeTo: statusItem.button, mainPanelHeight: mainPanel.height, formatter: formatter)
     }
 }
 

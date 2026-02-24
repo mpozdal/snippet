@@ -8,9 +8,9 @@ final class MainPanelController {
 
     let height: CGFloat = Constants.Panels.mainHeight
 
-    func show(relativeTo button: NSStatusBarButton?, manager: ClipboardManager) {
+    func show(relativeTo button: NSStatusBarButton?, manager: ClipboardManager, formatter: CodeFormatter) {
         if panel == nil {
-            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: MenuPopupView(manager: manager))
+            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: MenuPopupView(manager: manager).environment(formatter))
         }
 
         position(panel: panel, relativeTo: button)
@@ -30,7 +30,7 @@ final class MainPanelController {
     func hide() {
         panel?.orderOut(nil)
         isShown = false
-        // Remove the click monitor if present
+
         if let monitor = clickMonitor {
             NSEvent.removeMonitor(monitor)
             clickMonitor = nil
