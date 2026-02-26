@@ -1,16 +1,10 @@
 import SwiftUI
 
 struct BottomBarView: View {
-    @Environment(CodeFormatter.self) private var formatter
-
     var body: some View {
         HStack {
             Button("Preferences") {
-                if formatter.currentTheme == "atom-one-dark" {
-                    formatter.setTheme(theme: "atom-one-light")
-                } else {
-                    formatter.setTheme(theme: "atom-one-dark")
-                }
+                print("click")
             }
             .buttonStyle(.borderless)
 

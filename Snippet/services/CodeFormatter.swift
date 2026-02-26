@@ -6,20 +6,10 @@ import SwiftUI
 class CodeFormatter {
     private let highlightr = Highlighter()
 
-    var currentTheme: String = "atom-one-dark"
+    private var defaultTheme: String = Constants.Theme.defaultTheme
 
-    init() {
-        setTheme(theme: currentTheme)
-    }
-
-    func setTheme(theme: String) {
-        highlightr?.setTheme(theme)
-
-        currentTheme = theme
-    }
-
-    var themeBackgroundColor: Color {
-        let _ = currentTheme
+    func getThemeBackgroundColor(theme: String?) -> Color {
+        highlightr?.setTheme(theme ?? defaultTheme)
 
         if let nsColor = highlightr?.theme.themeBackgroundColour {
             return Color(nsColor: nsColor)
@@ -28,7 +18,17 @@ class CodeFormatter {
         return Color.black
     }
 
-    func getHighlightedCode(text: String, language: String?) -> AttributedString {
+    func getAvailableThemes() -> [String] {
+        return highlightr?.availableThemes() ?? []
+    }
+
+    func getSupportedLanguages() -> [String] {
+        return highlightr?.supportedLanguages() ?? []
+    }
+
+    func getHighlightedCode(text: String, theme: String?, language: String?) -> AttributedString {
+        highlightr?.setTheme(theme ?? defaultTheme)
+
         guard let highlighted = highlightr?.highlight(text, as: language) else {
             return AttributedString(text)
         }

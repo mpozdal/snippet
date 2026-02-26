@@ -1,33 +1,26 @@
 import AppKit
+import SwiftData
 import SwiftUI
 
 struct MenuPopupView: View {
-    let manager: ClipboardManager
-
-    @Environment(CodeFormatter.self) private var formatter
+    @Query(sort: \CodeSnippet.timestamp, order: .reverse) var snippets: [CodeSnippet]
 
     var body: some View {
-        let highlighted = formatter.getHighlightedCode(text: manager.lastCopiedText, language: nil)
+        VStack(spacing: 0) {
+            if let latest = snippets.first {
+                header
 
-        return VStack(spacing: 0) {
-            header
-
-            ScrollView {
-                CodeCardView(highlighted: highlighted)
+                CodeCardView(codeSnippet: latest)
                     .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
 
-                CodeCardView(highlighted: highlighted)
-                    .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
-
-                CodeCardView(highlighted: highlighted)
-                    .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
+                footer
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                    .padding(.top, 16)
+            } else {
+                ContentUnavailableView("No Snippets", systemImage: "curlybraces", description: Text("Copy some code to see it here."))
+                    .frame(maxHeight: .infinity)
             }
-
-            Spacer()
-
-            footer
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
         }
         .frame(width: Constants.Panels.mainWidth, height: Constants.Panels.mainHeight)
         .background(
@@ -42,7 +35,7 @@ struct MenuPopupView: View {
 
     private var header: some View {
         HStack {
-            Label("Recent Snippets", systemImage: "curlybraces")
+            Label("Recent Snippet", systemImage: "curlybraces")
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundColor(.secondary)
 
@@ -60,7 +53,7 @@ struct MenuPopupView: View {
                 HStack {
                     Spacer()
 
-                    SnippetCountView()
+                    SnippetCountView(count: snippets.count)
 
                     Text("Explore all snippets")
 

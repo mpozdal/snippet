@@ -1,7 +1,10 @@
 import AppKit
+import SwiftData
 import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private(set) static var shared: AppDelegate!
+
     private var statusItem: NSStatusItem!
     private var eventTap: CFMachPort?
     private var eventTapRunLoopSource: CFRunLoopSource?
@@ -10,10 +13,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let mainPanel = MainPanelController()
     private let bottomPanel = BottomPanelController()
 
-    private var formatter = CodeFormatter()
+    var container: ModelContainer = {
+        let schema = Schema([CodeSnippet.self])
+
+        let config = ModelConfiguration(isStoredInMemoryOnly: false)
+
+        do {
+            return try ModelContainer(for: schema, configurations: [config])
+        } catch {
+            let url = URL.applicationSupportDirectory.appendingPathComponent("default.store")
+            try? FileManager.default.removeItem(at: url)
+
+            return try! ModelContainer(for: schema, configurations: [config])
+        }
+
+    }()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+
+        AppDelegate.shared = self
 
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "curlybraces", accessibilityDescription: nil)
@@ -63,8 +82,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        mainPanel.show(relativeTo: statusItem.button, manager: clipboardManager, formatter: formatter)
-        bottomPanel.show(relativeTo: statusItem.button, mainPanelHeight: mainPanel.height, formatter: formatter)
+        mainPanel.show(relativeTo: statusItem.button, manager: clipboardManager, container: container)
+        bottomPanel.show(relativeTo: statusItem.button, mainPanelHeight: mainPanel.height)
     }
 }
 
@@ -74,7 +93,10 @@ private func handleKeyDown(proxy: CGEventTapProxy, type: CGEventType, cgEvent: C
     if nsEvent?.modifierFlags.contains(.command) == true, nsEvent?.charactersIgnoringModifiers?.lowercased() == "c" {
         if let userInfo = userInfo {
             let manager = Unmanaged<ClipboardManager>.fromOpaque(userInfo).takeUnretainedValue()
-            manager.handleCopyShortcut()
+
+            let context = AppDelegate.shared.container.mainContext
+
+            manager.handleCopyShortcut(context: context)
         }
     }
 

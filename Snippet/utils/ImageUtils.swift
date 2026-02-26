@@ -3,69 +3,113 @@ import SwiftUI
 
 func copyPrettyCodePNGToClipboard(
     _ attributedString: AttributedString,
-    width: CGFloat = 720
+    width: CGFloat = 900,
+    outerBackground: NSColor = .systemPurple, // Kolor ramki zewnętrznej
+    editorBackground: NSColor = NSColor(calibratedWhite: 0.1, alpha: 1) // Tło edytora (z motywu)
 ) {
     let nsAttr = NSAttributedString(attributedString)
 
-    let padding: CGFloat = 20
-    let headerHeight: CGFloat = 32
+    // --- KONFIGURACJA WYMIARÓW ---
+    let outerPadding: CGFloat = 60 // Szerokość kolorowej ramki
+    let internalPadding: CGFloat = 30 // Margines kodu wewnątrz edytora
+    let headerHeight: CGFloat = 40 // Wysokość paska z kropkami
+    let cornerRadius: CGFloat = 16
 
-    // Auto-height na podstawie treści
-    let textWidth = width - padding * 2
+    let cardWidth = width - (outerPadding * 2)
+    let textWidth = cardWidth - (internalPadding * 2)
     let textHeight = estimatedHeight(for: nsAttr, width: textWidth)
-    let height = textHeight + padding * 2 + headerHeight
 
-    let size = CGSize(width: width, height: height)
-    let image = NSImage(size: size)
+    let cardHeight = textHeight + (internalPadding * 2) + headerHeight
+    let totalHeight = cardHeight + (outerPadding * 2)
+    let totalSize = CGSize(width: width, height: totalHeight)
+
+    let image = NSImage(size: totalSize)
     image.lockFocus()
 
-    // 🌫 Tło z cieniem
-    let cardRect = CGRect(origin: .zero, size: size)
+    // 1. TŁO ZEWNĘTRZNE (Ramka)
+    let outerRect = CGRect(origin: .zero, size: totalSize)
+    outerBackground.setFill()
+    outerRect.fill()
+
+    // Opcjonalny gradient na ramce dla głębi
+    let outerGradient = NSGradient(starting: .white.withAlphaComponent(0.2), ending: .black.withAlphaComponent(0.2))
+    outerGradient?.draw(in: outerRect, angle: -45)
+
+    // 2. CIEŃ KARTY
+    let context = NSGraphicsContext.current?.cgContext
+    context?.saveGState()
+
     let shadow = NSShadow()
-    shadow.shadowColor = NSColor.black.withAlphaComponent(0.35)
-    shadow.shadowBlurRadius = 20
-    shadow.shadowOffset = NSSize(width: 0, height: -6)
+    shadow.shadowColor = NSColor.black.withAlphaComponent(0.5)
+    shadow.shadowBlurRadius = 25
+    shadow.shadowOffset = NSSize(width: 0, height: -12)
     shadow.set()
 
-    let cardPath = NSBezierPath(roundedRect: cardRect, xRadius: 14, yRadius: 14)
-    NSColor(calibratedWhite: 0.08, alpha: 1).setFill() // ciemny, "premium" background
+    // 3. TŁO EDYTORA (Karta)
+    let cardRect = CGRect(x: outerPadding, y: outerPadding, width: cardWidth, height: cardHeight)
+    let cardPath = NSBezierPath(roundedRect: cardRect, xRadius: cornerRadius, yRadius: cornerRadius)
+
+    editorBackground.setFill()
     cardPath.fill()
 
-    shadow.set() // reset
+    context?.restoreGState() // Wyłączamy cień dla elementów wewnątrz
 
-    // 🧱 Header jak okienko macOS
-    let headerRect = CGRect(x: 0, y: height - headerHeight, width: width, height: headerHeight)
-    let headerPath = NSBezierPath(roundedRect: headerRect, xRadius: 14, yRadius: 14)
-    NSColor(calibratedWhite: 0.12, alpha: 1).setFill()
+    // 4. PASEK TYTUŁOWY (Lekko ciemniejszy od tła edytora)
+    let headerRect = CGRect(x: cardRect.minX, y: cardRect.maxY - headerHeight, width: cardWidth, height: headerHeight)
+    let headerPath = NSBezierPath(roundedRect: headerRect, xRadius: cornerRadius, yRadius: cornerRadius) // Zaokrąglamy tylko górę (uproszczenie)
+
+    editorBackground.darker(by: 0.05).setFill()
     headerPath.fill()
 
-    // 🔴🟡🟢 kropki okienka
-    let dotsY = headerRect.midY - 4
-    let dotX: CGFloat = 14
-    let spacing: CGFloat = 10
+    // 5. KROPKI SYSTEMOWE
+    let dotY = headerRect.midY - 5
+    let dotSpacing: CGFloat = 18
+    let firstDotX = headerRect.minX + 20
 
-    NSColor.systemRed.withAlphaComponent(0.8).setFill()
-    NSBezierPath(ovalIn: CGRect(x: dotX, y: dotsY, width: 8, height: 8)).fill()
+    let colors: [NSColor] = [.systemRed, .systemYellow, .systemGreen]
+    for (i, color) in colors.enumerated() {
+        let dotRect = CGRect(x: firstDotX + CGFloat(i) * dotSpacing, y: dotY, width: 10, height: 10)
+        color.withAlphaComponent(0.8).setFill()
+        NSBezierPath(ovalIn: dotRect).fill()
+    }
 
-    NSColor.systemYellow.withAlphaComponent(0.8).setFill()
-    NSBezierPath(ovalIn: CGRect(x: dotX + spacing, y: dotsY, width: 8, height: 8)).fill()
-
-    NSColor.systemGreen.withAlphaComponent(0.8).setFill()
-    NSBezierPath(ovalIn: CGRect(x: dotX + spacing * 2, y: dotsY, width: 8, height: 8)).fill()
-
-    // 🧾 Tekst
+    // 6. RYSOWANIE KODU
+    // Przesuwamy tekst, aby był poniżej paska nagłówka
     let textRect = CGRect(
-        x: padding,
-        y: padding,
-        width: width - padding * 2,
-        height: height - padding * 2 - headerHeight
+        x: cardRect.minX + internalPadding,
+        y: cardRect.minY + internalPadding,
+        width: textWidth,
+        height: textHeight
     )
+
     nsAttr.draw(in: textRect)
 
     image.unlockFocus()
 
+    // 7. EXPORT DO SCHOWKA
     NSPasteboard.general.clearContents()
     NSPasteboard.general.writeObjects([image])
+}
+
+/// Pomocnicze rozszerzenie do przyciemniania koloru tła nagłówka
+extension NSColor {
+    func darker(by amount: CGFloat) -> NSColor {
+        // Konwertujemy kolor do przestrzeni RGB, aby bezpiecznie pobrać składowe
+        guard let rgbColor = usingColorSpace(.deviceRGB) else {
+            // Jeśli konwersja się nie uda (bardzo rzadkie), zwracamy oryginał
+            return self
+        }
+
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        rgbColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+
+        return NSColor(
+            calibratedRed: max(r - amount, 0),
+            green: max(g - amount, 0),
+            blue: max(b - amount, 0),
+            alpha: a
+        )
+    }
 }
 
 func estimatedHeight(for attributedString: NSAttributedString, width: CGFloat) -> CGFloat {

@@ -1,22 +1,53 @@
+import AppKit
 import Combine
 import Observation
+import SwiftData
 import SwiftUI
 
 @Observable
 class ClipboardManager: ObservableObject {
-    var lastCopiedText: String = readClipboardText() ?? "Empty clipboard"
+    private(set) var textFromClipboard: String?
 
-    private var formatter = CodeFormatter()
-
-    func handleCopyShortcut() {
+    func handleCopyShortcut(context: ModelContext) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            if let text = readClipboardText() {
-                self.lastCopiedText = text
+            if let text = self.readClipboardText() {
+                guard text != self.textFromClipboard else { return }
 
-                let code = self.formatter.getHighlightedCode(text: self.lastCopiedText, language: nil)
+                self.textFromClipboard = text
 
-                copyPrettyCodePNGToClipboard(code)
+                let newSnippet = CodeSnippet(title: "ClipboardManager.swift", code: text, sourceApp: self.getSourceApplication(), theme: nil)
+
+                context.insert(newSnippet)
+
+                try? context.save()
             }
         }
+    }
+
+    private func getSourceApplication() -> SourceApp {
+        if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+            return SourceApp(
+                name: frontmostApp.localizedName ?? "Unknown",
+                bundleId: frontmostApp.bundleIdentifier ?? "Unknown"
+            )
+        }
+
+        return SourceApp.unknown
+    }
+
+    private func readClipboardText() -> String? {
+        let pasteboard = NSPasteboard.general
+
+        guard let rawString = pasteboard.string(forType: .string) else {
+            return nil
+        }
+
+        let trimmed = rawString.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmed.isEmpty {
+            return nil
+        }
+
+        return trimmed
     }
 }

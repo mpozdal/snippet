@@ -1,4 +1,5 @@
 import AppKit
+import SwiftData
 import SwiftUI
 
 final class MainPanelController {
@@ -8,9 +9,9 @@ final class MainPanelController {
 
     let height: CGFloat = Constants.Panels.mainHeight
 
-    func show(relativeTo button: NSStatusBarButton?, manager: ClipboardManager, formatter: CodeFormatter) {
+    func show(relativeTo button: NSStatusBarButton?, manager: ClipboardManager, container: ModelContainer) {
         if panel == nil {
-            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: MenuPopupView(manager: manager).environment(formatter))
+            panel = createPanel(width: Constants.Panels.mainWidth, height: height, rootView: MenuPopupView().modelContainer(container))
         }
 
         position(panel: panel, relativeTo: button)
