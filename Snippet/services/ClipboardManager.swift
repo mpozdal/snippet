@@ -15,7 +15,7 @@ class ClipboardManager: ObservableObject {
 
                 self.textFromClipboard = text
 
-                let newSnippet = CodeSnippet(title: "ClipboardManager.swift", code: text, sourceApp: self.getSourceApplication(), theme: nil)
+                let newSnippet = CodeSnippet(title: "ClipboardManager.swift", code: text, sourceApp: self.getSourceApplication(), theme: Constants.Theme.defaultTheme)
 
                 context.insert(newSnippet)
 

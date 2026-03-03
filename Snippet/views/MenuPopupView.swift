@@ -12,11 +12,10 @@ struct MenuPopupView: View {
 
                 CodeCardView(codeSnippet: latest)
                     .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
+                    .animation(.default, value: snippets)
 
                 footer
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
-                    .padding(.top, 16)
+                    .padding()
             } else {
                 ContentUnavailableView("No Snippets", systemImage: "curlybraces", description: Text("Copy some code to see it here."))
                     .frame(maxHeight: .infinity)

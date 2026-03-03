@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct CodeCardView: View {
@@ -5,12 +6,15 @@ struct CodeCardView: View {
     
     private let codeFormatter = CodeFormatter()
     
+    @Environment(\.modelContext) private var modelContext
+    
     private var highlightedCode: AttributedString {
-        codeFormatter.getHighlightedCode(text: codeSnippet.code, theme: nil, language: nil)
+        codeFormatter.getHighlightedCode(text: codeSnippet.code, theme: codeSnippet.theme, language: nil)
     }
     
     private var themeBackground: Color {
-        codeFormatter.getThemeBackgroundColor(theme: codeSnippet.theme)
+        print(codeSnippet.theme)
+        return codeFormatter.getThemeBackgroundColor(theme: codeSnippet.theme)
     }
     
     var body: some View {
@@ -29,6 +33,7 @@ struct CodeCardView: View {
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
         .background(RoundedRectangle(cornerRadius: 10).fill(themeBackground))
+        .transition(.scale(scale: 0.8).combined(with: .opacity))
         .padding(.horizontal, 18)
     }
     
@@ -67,6 +72,13 @@ struct CodeCardView: View {
                 }
                 Button(action: {}) {
                     Label("Share", systemImage: "square.and.arrow.up")
+                }
+                Divider()
+                Button(role: .destructive, action: {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        modelContext.delete(codeSnippet)
+                    }
+                }) { Label("Remove snippet", systemImage: "trash")
                 }
             }, label: {
                 Image(systemName: "list.dash")
