@@ -6,6 +6,12 @@ import SwiftUI
 
 @Observable
 class ClipboardManager: ObservableObject {
+    let settings: SettingsManager
+
+    init(settings: SettingsManager) {
+        self.settings = settings
+    }
+
     private(set) var textFromClipboard: String?
 
     func handleCopyShortcut(context: ModelContext) {
@@ -15,7 +21,7 @@ class ClipboardManager: ObservableObject {
 
                 self.textFromClipboard = text
 
-                let newSnippet = CodeSnippet(title: "ClipboardManager.swift", code: text, sourceApp: self.getSourceApplication(), theme: Constants.Theme.defaultTheme)
+                let newSnippet = CodeSnippet(title: "ClipboardManager.swift", code: text, sourceApp: self.getSourceApplication(), theme: self.settings.theme, fontSize: self.settings.fontSize, backgroundColorHex: self.settings.backgroundColorHex)
 
                 context.insert(newSnippet)
 

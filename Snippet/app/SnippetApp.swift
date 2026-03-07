@@ -7,7 +7,8 @@ struct SnippetApp: App {
 
     var body: some Scene {
         Settings {
-            EmptyView()
+            SettingsView()
+                .environment(appDelegate.settings)
         }
     }
 }

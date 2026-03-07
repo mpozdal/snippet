@@ -13,7 +13,6 @@ struct CodeCardView: View {
     }
     
     private var themeBackground: Color {
-        print(codeSnippet.theme)
         return codeFormatter.getThemeBackgroundColor(theme: codeSnippet.theme)
     }
     
@@ -66,7 +65,7 @@ struct CodeCardView: View {
                     Label("Edit", systemImage: "pencil")
                 }
                 Button(action: {
-                    copyPrettyCodePNGToClipboard(highlightedCode, editorBackground: NSColor(themeBackground))
+                    copyPrettyCodePNGToClipboard(highlightedCode, fontSize: codeSnippet.fontSize, outerBackground: NSColor(hex: codeSnippet.backgroundColorHex) ?? .black, editorBackground: NSColor(themeBackground))
                 }) {
                     Label("Copy as image", systemImage: "document.on.document")
                 }

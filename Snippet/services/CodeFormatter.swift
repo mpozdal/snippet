@@ -2,7 +2,6 @@ import Highlighter
 import Observation
 import SwiftUI
 
-@Observable
 class CodeFormatter {
     private let highlightr = Highlighter()
 

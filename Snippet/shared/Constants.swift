@@ -16,3 +16,21 @@ enum Constants {
         static let defaultTheme: String = "atom-one-dark"
     }
 }
+
+enum SettingsCategory: String, CaseIterable, Identifiable {
+    case general = "General"
+    case appearance = "Apperance"
+    case shortcuts = "Shortcuts"
+
+    var id: String {
+        self.rawValue
+    }
+
+    var icon: String {
+        switch self {
+        case .general: return "gearshape"
+        case .appearance: return "paintbrush"
+        case .shortcuts: return "keyboard"
+        }
+    }
+}
