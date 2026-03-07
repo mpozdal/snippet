@@ -3,10 +3,8 @@ import SwiftUI
 struct BottomBarView: View {
     var body: some View {
         HStack {
-            Button("Preferences") {
-                print("click")
-            }
-            .buttonStyle(.borderless)
+            SettingsLink { Text("Preferences") }
+                .buttonStyle(.borderless)
 
             Spacer()
 

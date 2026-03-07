@@ -34,7 +34,7 @@ struct MenuPopupView: View {
 
     private var header: some View {
         HStack {
-            Label("Recent Snippet", systemImage: "curlybraces")
+            Label("Snippet", systemImage: "curlybraces")
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundColor(.secondary)
 

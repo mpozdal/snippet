@@ -4,11 +4,12 @@ import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) static var shared: AppDelegate!
+    let settings = SettingsManager()
 
     private var statusItem: NSStatusItem!
     private var eventTap: CFMachPort?
     private var eventTapRunLoopSource: CFRunLoopSource?
-    private let clipboardManager = ClipboardManager()
+    private lazy var clipboardManager = ClipboardManager(settings: settings)
 
     private let mainPanel = MainPanelController()
     private let bottomPanel = BottomPanelController()
