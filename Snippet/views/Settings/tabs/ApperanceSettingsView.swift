@@ -19,7 +19,7 @@ struct ApperanceSettingsView: View {
 
                 SettingRow(title: "Image background color", content: {
                     ColorPicker("", selection: Binding(
-                        get: { Color(nsColor: settings.backgroundColor) },
+                        get: { Color(nsColor: NSColor(hex: settings.backgroundColorHex) ?? .black) },
                         set: { settings.backgroundColor = NSColor($0) }
                     ))
                 })
@@ -35,14 +35,14 @@ struct ApperanceSettingsView: View {
                         Combo(selected: $settings.fontName, list: availableFonts)
                     })
                     SettingRow(title: "Font size", content: {
-                        HStack{}.padding(.horizontal, 16)
+                        HStack {}.padding(.horizontal, 16)
                         Slider(value: $settings.fontSize,
                                in: 4 ... 36,
                                step: 1,
                                minimumValueLabel: Image(systemName: "textformat.size.smaller"),
                                maximumValueLabel: Image(systemName: "textformat.size.larger"),
                                label: {
-                                   Text(String(settings.fontSize) + " px")
+                                   Text(String(settings.fontSize.rounded()) + " px")
                                })
 
                     })

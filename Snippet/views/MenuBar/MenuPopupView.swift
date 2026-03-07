@@ -4,18 +4,31 @@ import SwiftUI
 
 struct MenuPopupView: View {
     @Query(sort: \CodeSnippet.timestamp, order: .reverse) var snippets: [CodeSnippet]
+    @State private var currentIndex: Int = 0
+
+    private var selectedSnippet: CodeSnippet? {
+        guard !snippets.isEmpty else { return nil }
+
+        let safeIndex = snippets.indices.contains(currentIndex) ? currentIndex : 0
+
+        return snippets[safeIndex]
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            if let latest = snippets.first {
+            if let selected = selectedSnippet {
                 header
 
-                CodeCardView(codeSnippet: latest)
+                CodeCardView(codeSnippet: selected)
+                    .id(selected.id)
                     .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
                     .animation(.default, value: snippets)
+                    .padding(.bottom)
+
+                Divider().padding(.horizontal, 18)
 
                 footer
-                    .padding()
+
             } else {
                 ContentUnavailableView("No Snippets", systemImage: "curlybraces", description: Text("Copy some code to see it here."))
                     .frame(maxHeight: .infinity)
@@ -40,18 +53,25 @@ struct MenuPopupView: View {
 
             Spacer()
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 18)
         .padding(.vertical, 12)
     }
 
     private var footer: some View {
-        VStack(spacing: 12) {
-            Divider()
+        HStack {
+            HStack(spacing: 8) {
+                navigationButton(systemImage: "chevron.left", enabled: currentIndex < snippets.count - 1) {
+                    withAnimation { currentIndex += 1 }
+                }
+                navigationButton(systemImage: "chevron.right", enabled: currentIndex > 0) {
+                    withAnimation { currentIndex -= 1 }
+                }
+            }
+
+            Spacer()
 
             Button(action: { print("Explore clicked") }) {
                 HStack {
-                    Spacer()
-
                     SnippetCountView(count: snippets.count)
 
                     Text("Explore all snippets")
@@ -63,5 +83,19 @@ struct MenuPopupView: View {
             }
             .buttonStyle(.borderless)
         }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 12)
     }
+}
+
+private func navigationButton(systemImage: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+    Button(action: action) {
+        Image(systemName: systemImage)
+            .font(.system(size: 12, weight: .bold))
+            .frame(width: 28, height: 28)
+            .background(RoundedRectangle(cornerRadius: 8).fill(.white.opacity(enabled ? 0.1 : 0.03)))
+            .foregroundColor(enabled ? .primary : .secondary.opacity(0.3))
+    }
+    .buttonStyle(.plain)
+    .disabled(!enabled)
 }

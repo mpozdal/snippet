@@ -3,7 +3,7 @@ import SwiftUI
 
 func copyPrettyCodePNGToClipboard(
     _ attributedString: AttributedString,
-    width: CGFloat = 900,
+    width: CGFloat = 1000,
     fontSize: CGFloat = 20,
     fontName: String = "SF Mono",
     outerBackground: NSColor = .systemPurple,
@@ -26,7 +26,8 @@ func copyPrettyCodePNGToClipboard(
 
     let cardWidth = width - (outerPadding * 2)
     let textWidth = cardWidth - (internalPadding * 2)
-    let textHeight = estimatedHeight(for: mutableAttr, width: textWidth)
+
+    let textHeight = estimatedHeight(for: mutableAttr, width: textWidth) + 20
 
     let cardHeight = textHeight + (internalPadding * 2) + headerHeight
     let totalHeight = cardHeight + (outerPadding * 2)
@@ -99,6 +100,20 @@ func copyPrettyCodePNGToClipboard(
 
     mutableAttr.draw(in: textRect)
 
+    let watermark = "{} snippet"
+    let watermarkAttrs: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 14, weight: .bold),
+        .foregroundColor: NSColor.white.withAlphaComponent(0.3)
+    ]
+    let watermarkSize = watermark.size(withAttributes: watermarkAttrs)
+    let watermarkRect = CGRect(
+        x: totalSize.width - watermarkSize.width - 25,
+        y: 20,
+        width: watermarkSize.width,
+        height: watermarkSize.height
+    )
+    watermark.draw(in: watermarkRect, withAttributes: watermarkAttrs)
+
     NSGraphicsContext.restoreGraphicsState()
 
     let finalImage = NSImage(size: totalSize)
@@ -114,7 +129,8 @@ func estimatedHeight(for attributedString: NSAttributedString, width: CGFloat) -
     let container = NSTextContainer(size: CGSize(width: width, height: .greatestFiniteMagnitude))
     layoutManager.addTextContainer(container)
     textStorage.addLayoutManager(layoutManager)
-    layoutManager.glyphRange(for: container)
+
+    layoutManager.ensureLayout(for: container)
     return layoutManager.usedRect(for: container).height
 }
 

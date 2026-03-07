@@ -1,3 +1,4 @@
+import AppKit
 import Observation
 import SwiftUI
 
@@ -20,7 +21,7 @@ class SettingsManager {
     }
 
     var backgroundColorHex: String {
-        didSet { UserDefaults.standard.set(backgroundColorHex, forKey: "backgroundColor") }
+        didSet { UserDefaults.standard.set(backgroundColorHex, forKey: "backgroundColorHex") }
     }
 
     var backgroundColor: NSColor {
@@ -34,7 +35,7 @@ class SettingsManager {
             "theme": Constants.Theme.defaultTheme,
             "fontSize": 13.0,
             "fontName": "SF Mono",
-            "backgroundColor": NSColor.black
+            "backgroundColorHex": "#1E1E1E"
         ])
 
         self.launchAtLogin = UserDefaults.standard.bool(forKey: "launchAtLogin")
